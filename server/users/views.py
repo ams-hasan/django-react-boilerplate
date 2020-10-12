@@ -5,13 +5,26 @@ from rest_framework import generics, permissions, status, views, viewsets
 from rest_framework.response import Response
 
 from .models import User
+from .permissions import IsSameUser
 from .serializers import UserSerializer, RegisterSerializer, LoginSerializer
 
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = [permissions.IsAuthenticated]
+
+    def get_permissions(self):
+        if self.action == "create":
+            permission_classes = [permissions.IsAdminUser]
+        elif (
+            self.action == "update"
+            or self.action == "partial_update"
+            or self.action == "destroy"
+        ):
+            permission_classes = [IsSameUser]
+        else:
+            permission_classes = [permissions.IsAuthenticated]
+        return [permission() for permission in permission_classes]
 
 
 class RegisterAPI(generics.GenericAPIView):

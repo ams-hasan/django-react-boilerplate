@@ -35,10 +35,10 @@ class LoginAPI(views.APIView):
         user = serializer.validated_data
         if user:
             token, created = Token.objects.get_or_create(user=user)
-            return Response({
-                "user": UserSerializer(user).data,
-                "token": token.key
-            }, status=status.HTTP_200_OK)
+            return Response(
+                {"user": UserSerializer(user).data, "token": token.key},
+                status=status.HTTP_200_OK,
+            )
         return Response(status=status.HTTP_400_BAD_REQUEST, data=serializer.errors)
 
 

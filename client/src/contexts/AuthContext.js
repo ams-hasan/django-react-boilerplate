@@ -1,36 +1,36 @@
 import React, { createContext, useState } from 'react';
 
 const TOKEN_KEY = 'django-react-boilerplate-token';
-const ME_KEY = 'django-react-boilerplate-me';
+const USER_KEY = 'django-react-boilerplate-user';
 
 const AuthContext = createContext({
     token: null,
-    me: null,
+    user: null,
 });
 
 const AuthProvider = (props) => {
     const [token, setToken] = useState(localStorage.getItem(TOKEN_KEY) || null);
-    const [me, setMe] = useState(localStorage.getItem(ME_KEY) || null);
+    const [user, setUser] = useState(localStorage.getItem(USER_KEY) || null);
 
     const onLoginSuccess = (data) => {
         localStorage.setItem(TOKEN_KEY, data.token);
-        localStorage.setItem(ME_KEY, data.user);
+        localStorage.setItem(USER_KEY, data.user);
         setToken(data.token);
-        setMe(data.user);
+        setUser(data.user);
     };
 
     const onLogoutSuccess = () => {
         localStorage.removeItem(TOKEN_KEY);
-        localStorage.removeItem(ME_KEY);
+        localStorage.removeItem(USER_KEY);
         setToken(null);
-        setMe(null);
+        setUser(null);
     };
 
     return (
         <AuthContext.Provider
             value={{
                 token,
-                me,
+                user,
                 onLoginSuccess,
                 onLogoutSuccess,
             }}

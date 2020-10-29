@@ -24,10 +24,13 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-export default function Login(props) {
-    const loginStatePrimary = {
+export default function Register(props) {
+    const registerStatePrimary = {
         email: '',
+        first_name: '',
+        last_name: '',
         password: '',
+        confirm_password: '',
     };
 
     const notificationStatePrimary = {
@@ -36,7 +39,7 @@ export default function Login(props) {
     };
 
     const classes = useStyles();
-    const [values, setValues] = useState(loginStatePrimary);
+    const [values, setValues] = useState(registerStatePrimary);
     const [notification, setNotification] = useState(notificationStatePrimary);
     const { token, onLoginSuccess } = useContext(AuthContext);
 
@@ -57,24 +60,34 @@ export default function Login(props) {
 
     const onSubmit = (e) => {
         e.preventDefault();
+        if (values.password !== values.confirm_password) {
+            setNotification({
+                message: "Passwords don't match",
+                type: 'error',
+            });
+            return;
+        }
         axios
-            .post('http://localhost:8000/api/auth/login/', values)
+            .post('http://localhost:8000/api/auth/register/', values)
             .then((response) => {
                 onLoginSuccess(response.data);
-                setValues(loginStatePrimary);
             })
             .catch((error) => {
-                if (
-                    error.response.data &&
-                    error.response.data.non_field_errors
-                ) {
-                    setNotification({
-                        message: error.response.data.non_field_errors[0],
-                        type: 'error',
-                    });
+                if (error.response.data) {
+                    console.log(error.response.data);
+                    let message = '';
+                    if (error.response.data.hasOwnProperty('email')) {
+                        message = error.response.data.email[0];
+                    } else if (error.response.data.hasOwnProperty('password')) {
+                        message = error.response.data.password[0];
+                    }
+                    if (message === '') message = 'Registration failed!';
+                    if (message !== '') {
+                        setNotification({ message, type: 'error' });
+                    }
                 } else {
                     setNotification({
-                        message: "Can't log in with the provided credentials",
+                        message: 'Registration failed!',
                         type: 'error',
                     });
                 }
@@ -102,7 +115,7 @@ export default function Login(props) {
                 </Snackbar>
             )}
             <div className={classes.container}>
-                <Typography variant="h4">Log in to continue</Typography>
+                <Typography variant="h4">Create New Account</Typography>
                 <form onSubmit={onSubmit}>
                     <TextField
                         className={classes.input}
@@ -119,11 +132,44 @@ export default function Login(props) {
                         className={classes.input}
                         required
                         fullWidth
+                        name="first_name"
+                        label="First Name"
+                        type="text"
+                        variant="outlined"
+                        value={values.first_name}
+                        onChange={onInputChange}
+                    />
+                    <TextField
+                        className={classes.input}
+                        required
+                        fullWidth
+                        name="last_name"
+                        label="Last Name"
+                        type="text"
+                        variant="outlined"
+                        value={values.last_name}
+                        onChange={onInputChange}
+                    />
+                    <TextField
+                        className={classes.input}
+                        required
+                        fullWidth
                         name="password"
                         label="Password"
                         type="password"
                         variant="outlined"
                         value={values.password}
+                        onChange={onInputChange}
+                    />
+                    <TextField
+                        className={classes.input}
+                        required
+                        fullWidth
+                        name="confirm_password"
+                        label="Confirm Password"
+                        type="password"
+                        variant="outlined"
+                        value={values.confirm_password}
                         onChange={onInputChange}
                     />
                     <Button
@@ -133,10 +179,10 @@ export default function Login(props) {
                         color="secondary"
                         variant="contained"
                     >
-                        Log In
+                        Register
                     </Button>
                     <Typography variant="subtitle1" align="right">
-                        New user? <Link to="/register">Register</Link>
+                        Already have an account? <Link to="/login">Log in</Link>
                     </Typography>
                 </form>
             </div>

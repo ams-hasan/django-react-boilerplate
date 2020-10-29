@@ -35,7 +35,13 @@ class RegisterAPI(generics.GenericAPIView):
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
         if user:
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(
+                {
+                    "user": serializer.data,
+                    "token": Token.objects.create(user=user).key,
+                },
+                status=status.HTTP_201_CREATED,
+            )
         return Response(status=status.HTTP_400_BAD_REQUEST, data=serializer.errors)
 
 

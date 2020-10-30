@@ -3,6 +3,7 @@ import { Link, Redirect } from 'react-router-dom';
 import { Typography, Button, TextField, Snackbar } from '@material-ui/core';
 import MuiAlert from '@material-ui/lab/Alert';
 import { makeStyles } from '@material-ui/core/styles';
+import Navbar from '../../components/Navbar';
 import { AuthContext } from '../../contexts/AuthContext';
 import axios from 'axios';
 
@@ -12,11 +13,8 @@ const Alert = (props) => {
 
 const useStyles = makeStyles((theme) => ({
     container: {
-        position: 'absolute',
-        width: '30%',
-        top: '50%',
-        left: '50%',
-        transform: 'translate(-50%, -50%)',
+        width: '40%',
+        margin: '0 auto',
         padding: theme.spacing(2),
     },
     input: {
@@ -83,6 +81,7 @@ export default function Login(props) {
 
     return (
         <>
+            <Navbar />
             {notification.message === '' ? null : (
                 <Snackbar
                     anchorOrigin={{
@@ -102,7 +101,7 @@ export default function Login(props) {
                 </Snackbar>
             )}
             <div className={classes.container}>
-                <Typography variant="h4">Log in to continue</Typography>
+                <Typography variant="h5">Log in to continue</Typography>
                 <form onSubmit={onSubmit}>
                     <TextField
                         className={classes.input}
@@ -136,7 +135,8 @@ export default function Login(props) {
                         Log In
                     </Button>
                     <Typography variant="subtitle1" align="right">
-                        New user? <Link to="/register">Register</Link>
+                        Don't have an account?{' '}
+                        <Link to="/register">Register</Link>
                     </Typography>
                 </form>
             </div>

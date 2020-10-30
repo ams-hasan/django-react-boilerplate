@@ -9,13 +9,21 @@ from .models import User
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ("id", "email", "first_name", "last_name", "mobile_number")
+        fields = (
+            "id",
+            "email",
+            "first_name",
+            "last_name",
+            "avatar",
+            "mobile_number",
+        )
 
 
 class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ("id", "email", "first_name", "last_name", "mobile_number", "password")
+        fields = ("id", "email", "first_name", "last_name", "avatar",
+                  "mobile_number", "password")
         extra_kwargs = {"password": {"write_only": True}}
 
     def validate(self, data):
@@ -28,7 +36,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 
         if errors:
             raise serializers.ValidationError(errors)
-        return super(RegisterUserSerializer, self).validate(data)
+        return super(RegisterSerializer, self).validate(data)
 
     def create(self, validated_data):
         try:
@@ -47,5 +55,4 @@ class LoginSerializer(serializers.Serializer):
         if user and user.is_active:
             return user
         raise serializers.ValidationError(
-            "Unable to log in with the provided credentials"
-        )
+            "Unable to log in with the provided credentials")

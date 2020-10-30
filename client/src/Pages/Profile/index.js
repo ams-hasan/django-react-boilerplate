@@ -1,5 +1,4 @@
 import React, { useContext, useState } from 'react';
-import { Link, Redirect } from 'react-router-dom';
 import { Typography, Button, TextField, Snackbar } from '@material-ui/core';
 import MuiAlert from '@material-ui/lab/Alert';
 import { makeStyles } from '@material-ui/core/styles';
@@ -27,30 +26,23 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-export default function Register(props) {
-    const registerStatePrimary = {
-        email: '',
-        first_name: '',
-        last_name: '',
-        avatar: null,
-        mobile_number: '',
-        password: '',
-        confirm_password: '',
-    };
-
+export default function Profile(props) {
     const notificationStatePrimary = {
         message: '',
         type: '',
     };
 
     const classes = useStyles();
-    const [values, setValues] = useState(registerStatePrimary);
     const [notification, setNotification] = useState(notificationStatePrimary);
-    const { token, onLoginSuccess } = useContext(AuthContext);
+    const { token, user, onUpdateSuccess } = useContext(AuthContext);
 
-    if (token) {
-        return <Redirect to="/" />;
-    }
+    const profileStatePrimary = {
+        first_name: user.first_name,
+        last_name: user.last_name,
+        avatar: null,
+        mobile_number: user.mobile_number,
+    };
+    const [values, setValues] = useState(profileStatePrimary);
 
     const onInputChange = (event) => {
         const files = event.target.files;
@@ -67,13 +59,6 @@ export default function Register(props) {
 
     const onSubmit = (e) => {
         e.preventDefault();
-        if (values.password !== values.confirm_password) {
-            setNotification({
-                message: "Passwords don't match",
-                type: 'error',
-            });
-            return;
-        }
         let formData = new FormData();
         for (let prop in values) {
             if (prop === 'avatar') {
@@ -83,15 +68,23 @@ export default function Register(props) {
             }
         }
         axios
-            .post('http://localhost:8000/api/auth/register/', formData)
+            .patch(
+                `http://localhost:8000/api/auth/users/${user.id}/`,
+                formData,
+                { headers: { Authorization: `Token ${token}` } }
+            )
             .then((response) => {
-                onLoginSuccess(response.data);
+                onUpdateSuccess(response.data);
+                setNotification({
+                    message: 'Update Successful!',
+                    type: 'success',
+                });
             })
             .catch((error) => {
-                let message = 'Registration failed!';
+                let message = 'Update failed';
                 if (error.response.data) {
                     for (let prop in error.response.data) {
-                        if (registerStatePrimary.hasOwnProperty(prop)) {
+                        if (profileStatePrimary.hasOwnProperty(prop)) {
                             message = error.response.data[prop][0];
                             break;
                         }
@@ -124,19 +117,8 @@ export default function Register(props) {
                 </Snackbar>
             )}
             <div className={classes.container}>
-                <Typography variant="h5">Create New Account</Typography>
+                <Typography variant="h5">Update Profile</Typography>
                 <form onSubmit={onSubmit}>
-                    <TextField
-                        className={classes.input}
-                        required
-                        fullWidth
-                        name="email"
-                        label="Email"
-                        type="email"
-                        variant="outlined"
-                        value={values.email}
-                        onChange={onInputChange}
-                    />
                     <TextField
                         className={classes.input}
                         required
@@ -188,28 +170,6 @@ export default function Register(props) {
                             {values.avatar.name}
                         </Typography>
                     ) : null}
-                    <TextField
-                        className={classes.input}
-                        required
-                        fullWidth
-                        name="password"
-                        label="Password"
-                        type="password"
-                        variant="outlined"
-                        value={values.password}
-                        onChange={onInputChange}
-                    />
-                    <TextField
-                        className={classes.input}
-                        required
-                        fullWidth
-                        name="confirm_password"
-                        label="Confirm Password"
-                        type="password"
-                        variant="outlined"
-                        value={values.confirm_password}
-                        onChange={onInputChange}
-                    />
                     <Button
                         className={classes.input}
                         fullWidth
@@ -217,11 +177,8 @@ export default function Register(props) {
                         color="secondary"
                         variant="contained"
                     >
-                        Register
+                        Update
                     </Button>
-                    <Typography variant="subtitle1" align="right">
-                        Already have an account? <Link to="/login">Log in</Link>
-                    </Typography>
                 </form>
             </div>
         </>

@@ -1,9 +1,10 @@
 import React, { useContext, useState } from 'react';
 import axios from 'axios';
-import { Link } from 'react-router-dom';
+import { Link, withRouter } from 'react-router-dom';
 import {
     AppBar,
     Toolbar,
+    Avatar,
     Typography,
     IconButton,
     Menu,
@@ -26,11 +27,14 @@ const useStyles = makeStyles((theme) => ({
     link: {
         color: 'white',
     },
+    avatar: {
+        background: 'grey',
+    },
 }));
 
-export default function Navbar() {
+function Navbar(props) {
     const classes = useStyles();
-    const { token, onLogoutSuccess } = useContext(AuthContext);
+    const { token, user, onLogoutSuccess } = useContext(AuthContext);
     const [anchor, setAnchor] = useState(null);
 
     const onMenuClick = (event) => {
@@ -39,6 +43,10 @@ export default function Navbar() {
 
     const onMenuClose = () => {
         setAnchor(null);
+    };
+
+    const onProfileClick = () => {
+        props.history.push('/profile');
     };
 
     const onLogoutClick = () => {
@@ -64,7 +72,12 @@ export default function Navbar() {
                 {token ? (
                     <>
                         <IconButton aria-haspopup onClick={onMenuClick}>
-                            <AccountCircle />
+                            <Avatar
+                                className={classes.avatar}
+                                src={user ? user.avatar : null}
+                            >
+                                <AccountCircle />
+                            </Avatar>
                         </IconButton>
                         <Menu
                             anchorEl={anchor}
@@ -79,7 +92,9 @@ export default function Navbar() {
                             }}
                             open={Boolean(anchor)}
                         >
-                            <MenuItem>Profile</MenuItem>
+                            <MenuItem onClick={onProfileClick}>
+                                Profile
+                            </MenuItem>
                             <Divider />
                             <MenuItem onClick={onLogoutClick}>Log out</MenuItem>
                         </Menu>
@@ -101,3 +116,5 @@ export default function Navbar() {
         </AppBar>
     );
 }
+
+export default withRouter(Navbar);

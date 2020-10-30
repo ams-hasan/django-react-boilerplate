@@ -292,8 +292,8 @@ Session.vim
 tags
 
 # uploaded files
-api/media/
-api/static/
+server/media/
+server/static/
 
 
 ### VisualStudioCode template

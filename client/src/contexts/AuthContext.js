@@ -1,4 +1,4 @@
-import React, { createContext, useState } from 'react';
+import React, { createContext, useEffect, useState } from 'react';
 
 const TOKEN_KEY = 'django-react-boilerplate-token';
 const USER_KEY = 'django-react-boilerplate-user';
@@ -9,21 +9,35 @@ const AuthContext = createContext({
 });
 
 const AuthProvider = (props) => {
-    const [token, setToken] = useState(localStorage.getItem(TOKEN_KEY) || null);
-    const [user, setUser] = useState(localStorage.getItem(USER_KEY) || null);
+    const [token, setToken] = useState();
+    const [user, setUser] = useState();
+
+    useEffect(() => {
+        if (localStorage.getItem(TOKEN_KEY)) {
+            setToken(localStorage.getItem(TOKEN_KEY));
+        }
+        if (localStorage.getItem(USER_KEY)) {
+            setUser(JSON.parse(localStorage.getItem(USER_KEY)));
+        }
+    }, []);
+
+    useEffect(() => {
+        localStorage.setItem(TOKEN_KEY, token);
+        localStorage.setItem(USER_KEY, JSON.stringify(user));
+    }, [token, user]);
 
     const onLoginSuccess = (data) => {
-        localStorage.setItem(TOKEN_KEY, data.token);
-        localStorage.setItem(USER_KEY, data.user);
         setToken(data.token);
         setUser(data.user);
     };
 
     const onLogoutSuccess = () => {
-        localStorage.removeItem(TOKEN_KEY);
-        localStorage.removeItem(USER_KEY);
         setToken(null);
         setUser(null);
+    };
+
+    const onUpdateSuccess = (data) => {
+        setUser(data);
     };
 
     return (
@@ -33,6 +47,7 @@ const AuthProvider = (props) => {
                 user,
                 onLoginSuccess,
                 onLogoutSuccess,
+                onUpdateSuccess,
             }}
         >
             {props.children}

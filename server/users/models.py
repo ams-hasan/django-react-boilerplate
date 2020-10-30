@@ -37,12 +37,14 @@ class UserManager(BaseUserManager):
 class User(AbstractUser):
     username = None
     email = models.EmailField(_("email address"), unique=True)
+    avatar = models.ImageField(upload_to="avatars/", null=True, blank=True)
     mobile_number = PhoneNumberField(
         _("mobile number"),
         unique=True,
         null=True,
         blank=True,
-        validators=[MinLengthValidator(7), MaxLengthValidator(15)],
+        validators=[MinLengthValidator(7),
+                    MaxLengthValidator(15)],
     )
 
     USERNAME_FIELD = "email"

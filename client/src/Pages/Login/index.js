@@ -3,7 +3,6 @@ import { Link, Redirect } from 'react-router-dom';
 import { Typography, Button, TextField, Snackbar } from '@material-ui/core';
 import MuiAlert from '@material-ui/lab/Alert';
 import { makeStyles } from '@material-ui/core/styles';
-import Navbar from '../../components/Navbar';
 import { AuthContext } from '../../contexts/AuthContext';
 import axios from 'axios';
 
@@ -59,7 +58,6 @@ export default function Login(props) {
             .post('http://localhost:8000/api/auth/login/', values)
             .then((response) => {
                 onLoginSuccess(response.data);
-                setValues(loginStatePrimary);
             })
             .catch((error) => {
                 if (
@@ -81,7 +79,6 @@ export default function Login(props) {
 
     return (
         <>
-            <Navbar />
             {notification.message === '' ? null : (
                 <Snackbar
                     anchorOrigin={{
